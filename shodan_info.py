@@ -1,14 +1,12 @@
 import shodan
 import click
 from shodan.helpers import get_ip
-import credential
-# import osWAFscan
-import cloudfail_dir.cloudfail 
+from config import settings
+import osWAFscan
+#import cloudfail_dir.cloudfail 
 import os
-from dotenv import load_dotenv
 
-SHODAN_API_KEY = os.getenv("SHODAN_API_KEY")
-api = shodan.Shodan(SHODAN_API_KEY)
+api = shodan.Shodan(settings.SHODAN_API_KEY)
 
 
 def host_print_pretty(host):
@@ -97,24 +95,24 @@ def host_print_tsv(host, history=False):
         click.echo('')
 
 #проверка принадлежности ip-адреса к Cloudflare
-# def host_s(host, global_domain_name):
-#     r = api.host(host)
-#     if 'org' in r and r['org']:
-#         if r['org'] == 'Cloudflare, Inc.' and global_domain_name != str(get_ip(r)):
-#             two = api.host(osWAFscan.getIP(global_domain_name))
-#             return host_print_pretty(two)
-#         else:
-#             return host_print_pretty(r)
-#     else:
-#         return host_print_pretty(r)
-    
 def host_s(host, global_domain_name):
     r = api.host(host)
     if 'org' in r and r['org']:
         if r['org'] == 'Cloudflare, Inc.' and global_domain_name != str(get_ip(r)):
-            two = api.host(cloudfail(global_domain_name))
+            two = api.host(osWAFscan.getIP(global_domain_name))
             return host_print_pretty(two)
         else:
             return host_print_pretty(r)
     else:
         return host_print_pretty(r)
+    
+# def host_s(host, global_domain_name):
+#     r = api.host(host)
+#     if 'org' in r and r['org']:
+#         if r['org'] == 'Cloudflare, Inc.' and global_domain_name != str(get_ip(r)):
+#             two = api.host(cloudfail(global_domain_name))
+#             return host_print_pretty(two)
+#         else:
+#             return host_print_pretty(r)
+#     else:
+#         return host_print_pretty(r)
