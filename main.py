@@ -2,18 +2,14 @@ import telebot
 from telebot import types
 import shodan
 import os
-from dotenv import load_dotenv
-# from credential import credential
+
+from config import settings
 
 import traceback
 import get_ip_for_host
 import shodan_info
-#pip install python-dotenv
-load_dotenv()
 
-# TOKEN = credential.telegramtoken()
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-bot = telebot.TeleBot(TELEGRAM_TOKEN)
+bot = telebot.TeleBot(settings.BOT_TOKEN)
 global global_domain_name
 
 

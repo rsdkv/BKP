@@ -1,14 +1,12 @@
 import shodan
 import click
 from shodan.helpers import get_ip
-import credential
+from config import settings
 # import osWAFscan
-import cloudfail_dir.cloudfail 
+#import cloudfail_dir.cloudfail 
 import os
-from dotenv import load_dotenv
 
-SHODAN_API_KEY = os.getenv("SHODAN_API_KEY")
-api = shodan.Shodan(SHODAN_API_KEY)
+api = shodan.Shodan(settings.SHODAN_API_KEY)
 
 
 def host_print_pretty(host):
