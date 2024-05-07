@@ -37,10 +37,9 @@ def main(m):
         markup_inline.add(shodan)
         global_domain_name = m.text
         real_ip_address = get_ip_for_host.get_ip_by_hostname(m.text)
+        print(real_ip_address)
         if 'Invalid' in real_ip_address:
             bot.send_message(m.chat.id, 'Адрес не найден')
-        else:
-            bot.send_message(m.chat.id, 'Найденный адрес: ', real_ip_address, reply_markup=markup_inline)
     except:
         bot.send_message(m.chat.id, 'Ошибка в функции main')
         print(traceback.format_exc())
