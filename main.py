@@ -40,7 +40,7 @@ def main(m):
         if 'Invalid' in real_ip_address:
             bot.send_message(m.chat.id, 'Адрес не найден')
         else:
-            bot.send_message(m.chat.id, 'Найденный адрес: ' + real_ip_address, reply_markup=markup_inline)
+            bot.send_message(m.chat.id, real_ip_address, reply_markup=markup_inline)
     except:
         bot.send_message(m.chat.id, 'Ошибка в функции main')
         print(traceback.format_exc())
