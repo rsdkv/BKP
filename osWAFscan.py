@@ -13,3 +13,6 @@ def getIP(domain):
         return q
     else:
         return f'{socket.gethostbyname(domain)}'
+
+
+#файл не нужен, так как будет cloudfail
