@@ -20,7 +20,7 @@ def start(m):
         markup_inline = types.InlineKeyboardMarkup()
         confirmed = types.InlineKeyboardButton(text='Подтвердить', callback_data='confirm')
         markup_inline.add(confirmed)
-        msg = bot.send_message(m.chat.id, 'Добро пожаловать, {}!\nЭто инструмент RPS Killer\nНажимаю кнопку согласится вы подтверждаете, что вся ответсвеность за пользование ботом лежит на вас.'.format(name),reply_markup=markup_inline)
+        msg = bot.send_message(m.chat.id, 'Добро пожаловать, {}!\nЭто инструмент для проверки безопасности сайта\nНажимаю кнопку согласится вы подтверждаете, что вся ответсвеность за пользование ботом лежит на вас.'.format(name),reply_markup=markup_inline)
         bot.register_next_step_handler(msg,main)
     except:
         bot.send_message(m.chat.id, "Ошибка start")
@@ -40,7 +40,7 @@ def main(m):
         if 'Invalid' in real_ip_address:
             bot.send_message(m.chat.id, 'Адрес не найден')
         else:
-            bot.send_message(m.chat.id, 'Найденный адрес: ' + real_ip_address, reply_markup=markup_inline)
+            bot.send_message(m.chat.id, real_ip_address, reply_markup=markup_inline)
     except:
         bot.send_message(m.chat.id, 'Ошибка в функции main')
         print(traceback.format_exc())
@@ -59,10 +59,11 @@ def callback_inline(call):
                 r = ''.join(map(str, shodan_info.host_s(call.message.text, global_domain_name)))
                 markup_inline = types.InlineKeyboardMarkup()
                 vulns = types.InlineKeyboardButton(text='Уязвимости', callback_data='vulns')
-                dos = types.InlineKeyboardButton(text='DoS', callback_data='dos')
+                # dos = types.InlineKeyboardButton(text='DoS', callback_data='dos')
                 markup_inline.add(vulns)
-                markup_inline.add(dos)
+                # markup_inline.add(dos)
                 bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=r, reply_markup=markup_inline)
+            # elif call.data == 'vulns':
     except:
         bot.send_message(call.message.chat.id, 'Ошибка в функции callback_inline')
         print(traceback.format_exc())

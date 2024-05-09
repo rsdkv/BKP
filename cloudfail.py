@@ -14,7 +14,7 @@ import os
 import win_inet_pton
 import platform
 from colorama import Fore, Style
-from cloudfail_dir.DNSDumpsterAPI import DNSDumpsterAPI
+from DNSDumpsterAPI import DNSDumpsterAPI
 import dns.resolver
 import collections
 collections.Callable = collections.abc.Callable

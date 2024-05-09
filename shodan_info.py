@@ -106,13 +106,3 @@ def host_s(host, global_domain_name):
     else:
         return host_print_pretty(r)
     
-# def host_s(host, global_domain_name):
-#     r = api.host(host)
-#     if 'org' in r and r['org']:
-#         if r['org'] == 'Cloudflare, Inc.' and global_domain_name != str(get_ip(r)):
-#             two = api.host(cloudfail(global_domain_name))
-#             return host_print_pretty(two)
-#         else:
-#             return host_print_pretty(r)
-#     else:
-#         return host_print_pretty(r)

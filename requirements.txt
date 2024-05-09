@@ -1,3 +1,5 @@
 pydantic
 pytelegrambotapi
 shodan
+requests
+bs4
