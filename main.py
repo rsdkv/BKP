@@ -1,13 +1,11 @@
 import telebot
 from telebot import types
 import shodan
-import os
-
 from config import settings
-
 import traceback
 import get_ip_for_host
 import shodan_info
+import vulns_search
 
 bot = telebot.TeleBot(settings.BOT_TOKEN)
 global global_domain_name
@@ -59,11 +57,16 @@ def callback_inline(call):
                 r = ''.join(map(str, shodan_info.host_s(call.message.text, global_domain_name)))
                 markup_inline = types.InlineKeyboardMarkup()
                 vulns = types.InlineKeyboardButton(text='Уязвимости', callback_data='vulns')
-                # dos = types.InlineKeyboardButton(text='DoS', callback_data='dos')
                 markup_inline.add(vulns)
+                # dos = types.InlineKeyboardButton(text='DoS', callback_data='dos')
                 # markup_inline.add(dos)
                 bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=r, reply_markup=markup_inline)
-            # elif call.data == 'vulns':
+            elif call.data == 'vulns':
+                v = ''.join(map(str, vulns_search.cms_scan(global_domain_name)))
+                # print("===============================================================================")
+                # print(v)
+                markup_inline = types.InlineKeyboardMarkup()
+                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=v, reply_markup=markup_inline)
     except:
         bot.send_message(call.message.chat.id, 'Ошибка в функции callback_inline')
         print(traceback.format_exc())
