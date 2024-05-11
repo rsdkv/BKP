@@ -1,13 +1,14 @@
 import subprocess
 import re
 
-def cms_scan(domain):
-    
-    def remove_ansi_codes(text):
+def remove_ansi_codes(text):
         # Функция для удаления ANSI escape-кодов
         ansi_escape = re.compile(r'\x1b\[.*?m')
         return ansi_escape.sub('', text)
 
+def cms_scan(domain):
+    
+    
     # Вызов скрипта с передачей аргументов
     out = subprocess.run(["python3", "vulnx.py", "-u", domain, "-e", "--cms"], capture_output=True, text=True)
     
@@ -22,8 +23,8 @@ def cms_scan(domain):
         if line.strip().startswith('[+]'):
             results.append(line.strip())  # Добавляем строку в список результатов
 
-    for line in results:
-        return(line)
+    output = '\n'.join(results)
+    return output
 
 # if __name__ == "__main__":
-#     cms_scan("https://coin-bank.co/exchange-sberrub-to-ltc/")
+#     cms_scan("casino2x.com")

@@ -1,10 +1,9 @@
 import shodan
 import click
 from shodan.helpers import get_ip
-from config import settings
+import credential
 import osWAFscan
-#import cloudfail_dir.cloudfail 
-import os
+from config import settings
 
 api = shodan.Shodan(settings.SHODAN_API_KEY)
 
@@ -80,6 +79,10 @@ def host_print_pretty(host):
         a.append(t)
         q = (''.join(map(str, a)))
     info_lists.append(q)
+    print(info_lists)
+    for i in range(len(info_lists)):
+        if 'Уязвимости' in info_lists[i]:
+            print(1)
     return info_lists
 
 
@@ -94,7 +97,20 @@ def host_print_tsv(host, history=False):
             click.echo(click.style('\t({})'.format(date), fg='white', dim=True), nl=False)
         click.echo('')
 
-#проверка принадлежности ip-адреса к Cloudflare
+def vulns_lists(host):
+    if 'vulns' in host and len(host['vulns']) > 0:
+        vulns = []
+        for vuln in host['vulns']:
+            if vuln.startswith('!'):
+                continue
+            else:
+                vulns.append(vuln)
+
+        if len(vulns) > 0:
+            return vulns
+
+
+
 def host_s(host, global_domain_name):
     r = api.host(host)
     if 'org' in r and r['org']:
@@ -105,4 +121,7 @@ def host_s(host, global_domain_name):
             return host_print_pretty(r)
     else:
         return host_print_pretty(r)
-    
+
+def host_vuln_list(host):
+    r = api.host(host)
+    return vulns_lists(r)

@@ -6,10 +6,13 @@ import traceback
 import get_ip_for_host
 import shodan_info
 import vulns_search
+from cvedetail import CVESearch
+
 
 bot = telebot.TeleBot(settings.BOT_TOKEN)
-global global_domain_name
+global global_domain_name, c, vulns, count_list
 
+c = CVESearch()
 
 @bot.message_handler(commands=['start'])
 def start(m):
@@ -54,19 +57,55 @@ def callback_inline(call):
             elif call.data == 'nmap':
                 bot.edit_message_text(inline_message_id=call.inline_message_id, text='1')
             elif call.data == 'shodan':
-                r = ''.join(map(str, shodan_info.host_s(call.message.text, global_domain_name)))
+                info = shodan_info.host_s(call.message.text, global_domain_name)
+                r = ''.join(map(str, info))
                 markup_inline = types.InlineKeyboardMarkup()
                 vulns = types.InlineKeyboardButton(text='Уязвимости', callback_data='vulns')
-                markup_inline.add(vulns)
-                # dos = types.InlineKeyboardButton(text='DoS', callback_data='dos')
-                # markup_inline.add(dos)
+                dos = types.InlineKeyboardButton(text='DoS', callback_data='dos')
+                for i in range(len(info)):
+                    if 'Уязвимости' in info[i]:
+                        markup_inline.add(vulns)
+                markup_inline.add(dos)
                 bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=r, reply_markup=markup_inline)
+            # elif call.data == 'vulns':
+            #     v = ''.join(map(str, vulns_search.cms_scan(global_domain_name)))
+            #     markup_inline = types.InlineKeyboardMarkup()
+            #     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=v, reply_markup=markup_inline)
             elif call.data == 'vulns':
-                v = ''.join(map(str, vulns_search.cms_scan(global_domain_name)))
-                # print("===============================================================================")
-                # print(v)
-                markup_inline = types.InlineKeyboardMarkup()
-                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=v, reply_markup=markup_inline)
+                global count_list
+                count_list = 0
+                markup_inline_first = types.InlineKeyboardMarkup()
+                right_first = types.InlineKeyboardButton(text='➡️', callback_data='right')
+                markup_inline_first.add(right_first)
+                r = ''.join(call.message.text).split('\n')
+                global vulns_lists
+                vulns_lists = shodan_info.host_vuln_list(r[0])
+                bot.send_message(call.message.chat.id, c.id('{}'.format(vulns_lists[count_list])), reply_markup=markup_inline_first)
+            elif call.data == 'left':
+                count_list = count_list - 1
+                markup_inline_left = types.InlineKeyboardMarkup()
+                right = types.InlineKeyboardButton(text='➡️', callback_data='right')
+                left = types.InlineKeyboardButton(text='⬅️', callback_data='left')
+                if count_list != 0 and count_list != (len(vulns_lists)-1):
+                    markup_inline_left.add(left, right)
+                elif count_list == 0:
+                    markup_inline_left.add(right)
+                elif count_list == (len(count_list)-1):
+                    markup_inline_left.add(left)
+                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=c.id('{}'.format(vulns_lists[count_list])), reply_markup=markup_inline_left)
+            elif call.data == 'right':
+                count_list = count_list + 1
+                markup_inline_right = types.InlineKeyboardMarkup()
+                right = types.InlineKeyboardButton(text='➡️', callback_data='right')
+                left = types.InlineKeyboardButton(text='⬅️', callback_data='left')
+                if count_list != 0 and count_list != (len(vulns_lists)-1):
+                    markup_inline_right.add(left, right)
+                elif count_list == 0:
+                    markup_inline_right.add(right)
+                elif count_list == (len(count_list)-1):
+                    markup_inline_right.add(left)
+                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=c.id('{}'.format(vulns_lists[count_list])), reply_markup=markup_inline_right)
+ 
     except:
         bot.send_message(call.message.chat.id, 'Ошибка в функции callback_inline')
         print(traceback.format_exc())

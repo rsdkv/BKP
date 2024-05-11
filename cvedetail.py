@@ -1,22 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import requests
-from typing import Optional, Dict, MutableMapping
-
+from typing import Dict, MutableMapping
 from urllib.parse import urljoin
-
-# !!! pip install googletrans==4.0.0rc1 !!!
 from googletrans import Translator
 
-# Usage:
-# from cvedetail import CVESearch
-# c = CVESearch()
-# print(c.id("CVE-2020-15801"))
-
 class CVESearch(object):
-
-    def __init__(self, base_url: str='https://cve.circl.lu/', proxies: MutableMapping[str, str]={}, timeout: Optional[int]=None, verify=True):
+    def __init__(self, base_url: str='https://cve.circl.lu/', proxies: MutableMapping[str, str]={}, timeout: int=None, verify: bool=True):
         self.base_url = base_url
         self.session = requests.Session()
         self.session.proxies = proxies
@@ -25,6 +14,10 @@ class CVESearch(object):
             'User-Agent': 'PyCVESearch - python wrapper'})
         self.timeout = timeout
         self.verify = verify
+        self.translator = Translator(service_urls=[
+            'translate.google.com',
+            'translate.google.ru',
+        ])
 
     def _http_get(self, api_call, query=None):
         if query is None:
@@ -33,14 +26,26 @@ class CVESearch(object):
             url = urljoin(self.base_url, f'api/{api_call}/{query}')
         return self.session.get(url, timeout=self.timeout, verify=self.verify)
 
-    def id(self, param) -> Dict:
-        """ id() returns a dict containing a specific CVE ID """
+    def id(self, param) -> str:
+        """ id() returns a dict containing a specific CVE ID and translates the information """
         data = self._http_get('cve', query=param)
         js = data.json()
+        try:
+            about = js['capec'][0]['name']
+            solution = js['capec'][0]['solutions']
+            translated_about = self.translator.translate(about, src='en', dest='ru').text
+            translated_solution = self.translator.translate(solution, src='en', dest='ru').text
+        except:
+            about = 'Информация не найдена'
+            solution = '-'
+            translated_about = 'Information not found'
+            translated_solution = '-'
 
-        about = js['capec'][0]['name']
-        solution = js['capec'][0]['solutions']
-        
-        translator = Translator()
+        # Форматирование вывода с переводом
+        output = f"Описание {param}:\n {translated_about}\n{translated_solution}\n-----------------\nDescription {param}:\n {about}\n{solution}"
 
-        return f"""Описание {param}: {translator.translate(about, dest="ru").text}\nРешение: {translator.translate(solution, dest="ru").text}"""
+        return output
+
+# Пример использования
+# c = CVESearch()
+# print(c.id("CVE-2020-15801"))
